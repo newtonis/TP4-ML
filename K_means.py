@@ -1,6 +1,15 @@
 import random
 import numpy as np
 
+def get_furthest_point(element_set, centroids):
+    distances = {}
+    for element in element_set:
+        for centroid in centroids:
+        d = np.linalg.norm(element - centroid)
+        distances[_class.get_class_value()] = d
+    closest_class = min(distances, key=distances.get)
+    return closest_class
+
 
 class KMeansElement:
     def __init__(self, class_value, value, id, label):
@@ -33,6 +42,9 @@ class KMeansClass:
         self.summary = None
         self.most_representative_label = None
 
+    def set_centroid(self, centroid):
+        self.centroid = centroid
+
     def get_most_representative_label(self):
         if self.most_representative_label is None:
             self.calculate_most_representative_label()
@@ -49,8 +61,9 @@ class KMeansClass:
 
     def remove_element(self, element):
         for x in range(len(self.elements)-1, -1, -1):
-            if (self.elements[x] == element).all():
+            if (self.elements[x].get_element() == element.get_element()).all():
                 del self.elements[x]
+                break
 
     def get_centroid(self):
         return self.centroid
@@ -59,7 +72,7 @@ class KMeansClass:
         w = 0
         for i in range(self.get_elements_amount()):
             for j in range(i+1, self.get_elements_amount()):
-                w = (self.elements[i] - self.elements[j]) ** 2
+                w = (self.elements[i].get_element() - self.elements[j].get_element()) ** 2
         w /= self.get_elements_amount()
         return w
 
@@ -67,12 +80,12 @@ class KMeansClass:
         return self.class_value
 
     def get_distance_to_class(self, element):
-        return np.linalg.norm(self.get_centroid() - element)
+        return np.linalg.norm(self.get_centroid() - element.get_element())
 
     def calculate_centroid(self):
         new_centroid = 0
         for element in self.elements:
-            new_centroid += element
+            new_centroid += element.get_element()
         new_centroid /= len(self.elements)
         self.centroid = new_centroid
         return self.get_centroid()
@@ -121,11 +134,21 @@ class KMeans:
             results.append(result_for_element)
         return results
 
+    def max_distance_assignment(self, element_set, labels):
+        centroids = []
+        first_centroid = element_set[0]
+        centroids.append(first_centroid)
+        self.classes[0].set_centroid(first_centroid)
+        for _class in self.classes:
+            next_centroid = get_furthest_point(element_set, centroids)
+            _class.set_centroid(next_centroid)
+        self.random_assignment(element_set, labels)
+
     def random_assignment(self, element_set, labels):
         index = 0
         for element in element_set:
             class_value = random.randint(0, self.classes_amount-1)
-            self.classes[class_value].add_element(element)
+            self.classes[class_value].add_element(KMeansElement(class_value, element, index, labels[index]))
             self.elements.append(KMeansElement(class_value, element, index, labels[index]))
             index += 1
 
@@ -136,7 +159,7 @@ class KMeans:
     def get_closest_class(self, k_means_element):
         distances = {}
         for _class in self.classes:
-            d = _class.get_distance_to_class(k_means_element.get_element())
+            d = _class.get_distance_to_class(k_means_element)
             distances[_class.get_class_value()] = d
         closest_class = min(distances, key=distances.get)
         return closest_class
@@ -148,8 +171,8 @@ class KMeans:
             closest_class = self.get_closest_class(k_means_element)
             if closest_class != k_means_element.get_class():
                 has_changes = True
-                self.classes[k_means_element.get_class()].remove_element(k_means_element.get_element())
-                self.classes[closest_class].add_element(k_means_element.get_element())
+                self.classes[k_means_element.get_class()].remove_element(k_means_element)
+                self.classes[closest_class].add_element(k_means_element)
                 k_means_element.change_class(closest_class)
         self.stationary = not has_changes
 

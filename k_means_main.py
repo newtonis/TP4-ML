@@ -18,7 +18,7 @@ data = df.head(10).to_numpy()
 
 k = 2
 model = KMeans(k)
-model.fit(data)
+model.fit(data, real_classifications)
 # model.print_result(real_classifications)
 results = model.sarasa()
 confusion_matrix = ConfusionMatrix(['0', '1'])
@@ -26,3 +26,4 @@ for result in results:
     confusion_matrix.add_entry(result[LABEL], result[PREDICTION])
 confusion_matrix.summarize()
 confusion_matrix.print_confusion_matrix()
+# confusion_matrix.print_confusion_matrix_metrics()
