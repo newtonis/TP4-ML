@@ -7,10 +7,13 @@ from metrics import ConfusionMatrix
 PREDICTION = 2
 LABEL = 1
 
-df = pd.read_excel('./acath.xls').dropna()
+df = pd.read_csv('acath.csv').dropna()
 # df = df.replace(r'^\s+$', np.nan, regex=True).dropna(how='all')
 real_classifications = df['sigdz'].head(10).to_numpy()
 df = df.drop(['sigdz'], axis=1)
+
+print(df)
+
 data = df.head(10).to_numpy()
 
 k = 2

@@ -48,7 +48,9 @@ class KMeansClass:
         self.elements.append(element)
 
     def remove_element(self, element):
-        self.elements.remove(element)
+        for x in range(len(self.elements)-1, -1, -1):
+            if (self.elements[x] == element).all():
+                del self.elements[x]
 
     def get_centroid(self):
         return self.centroid
