@@ -38,6 +38,7 @@ class ConfusionMatrix:
         return accum
 
     def print_confusion_matrix_metrics(self):
+        print()
         print('total entries')
         print(self.entries)
         print('correct entries')
