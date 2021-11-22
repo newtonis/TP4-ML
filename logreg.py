@@ -6,6 +6,7 @@ from sklearn.model_selection import train_test_split
 import seaborn as sns
 import math
 import matplotlib.pyplot as plt
+from math import exp
 
 logreg = LogisticRegression(solver='lbfgs', random_state=0, verbose=1)
 
@@ -78,3 +79,21 @@ sns.heatmap(confusion_matrix, annot=True, fmt='g', xticklabels=[0, 1], yticklabe
 
 plt.title("Matriz de confusion")
 plt.show()
+
+print(logreg)
+b0 = logreg.intercept_
+b1 = logreg.coef_[0][0]
+b2 = logreg.coef_[0][1]
+b3 = logreg.coef_[0][2]
+
+x1 = 199
+x2 = 60
+x3 = 2
+
+p = exp(b0 + b1 * x1 + b2 * x2 + b3 * x3) / (1 + exp(b0 + b1 * x1 + b2 * x2 + b3 * x3))
+
+y_prob = logreg.predict_proba([[x1, x2, x3]])
+print(y_prob)
+
+print("prob a = %f" % p)
+print("prob b = %f " % y_prob[0][1])
